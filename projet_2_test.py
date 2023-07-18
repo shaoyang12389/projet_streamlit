@@ -67,7 +67,8 @@ def join_sans_nan(values):
   
 # Aggrégation des lignes avec même tconst
 film_selection = titre_selection_acteurs.groupby(['tconst','primaryTitle'], as_index=False).agg({'actor':join_sans_nan,
-                                                                                                 'actress':join_sans_nan,                                                                                                 'director':join_sans_nan,
+                                                                                                 'actress':join_sans_nan,             
+                                                                                                 'director':join_sans_nan,
                                                                                                  'startYear':'first',
                                                                                                  'runtimeMinutes':'first',
                                                                                                  'genres':'first',
