@@ -64,17 +64,16 @@ titre_selection_acteurs = titre_selection_acteurs[['tconst','primaryTitle','star
 def join_sans_nan(values):
   valeur_non_nan = [str(string) for string in values if pd.notnull(string)]
   return ','.join(valeur_non_nan)
+  
 # Aggrégation des lignes avec même tconst
 film_selection = titre_selection_acteurs.groupby(['tconst','primaryTitle'], as_index=False).agg({'actor':join_sans_nan,
-                                                                                                 'actress':join_sans_nan,
-                                                                                                 'director':join_sans_nan,
+                                                                                                 'actress':join_sans_nan,                                                                                                 'director':join_sans_nan,
                                                                                                  'startYear':'first',
                                                                                                  'runtimeMinutes':'first',
                                                                                                  'genres':'first',
                                                                                                  'averageRating':'first',
                                                                                                  'numVotes':'first'})
 film_selection = film_selection.rename(columns={'primaryTitle':'title'})
-
 dm_film_selection = pd.concat([film_selection, film_selection['genres'].str.get_dummies(sep=',')],axis=1)
 dm_film_selection = pd.concat([dm_film_selection, dm_film_selection['actor'].str.get_dummies(sep=',')],axis=1)
 dm_film_selection = pd.concat([dm_film_selection, dm_film_selection['actress'].str.get_dummies(sep=',')],axis=1)
@@ -90,7 +89,6 @@ X_scaled.columns = X.columns
 model_Classifier = KNeighborsClassifier(weights="distance", n_neighbors = 10, metric='cosine').fit(X_scaled, y)
 
 # Foction de recommandaton
-
 st.title('Recommandation de films')
 
 df = dm_film_selection
@@ -113,7 +111,7 @@ def reco(df, critere_titre, critere_genre, critere_acteur):
   except :
     recherche_genre_scaled = pd.DataFrame()
 
-  # # Traitement du critère Acteur
+  # Traitement du critère Acteur
   try:
     recherche_acteur = df.loc[(df[critere_acteur] == 1)]
     recherche_acteur_scaled = X_scaled.iloc[recherche_acteur.index]
@@ -126,7 +124,6 @@ def reco(df, critere_titre, critere_genre, critere_acteur):
   # Ajout des pondérations selon les critères
   recherche_titre_scaled = recherche_titre_scaled * nb_results
   print(recherche_titre_scaled)
-  # recherche_acteur_scaled[critere_acteur] = recherche_acteur_scaled[critere_acteur] * 2000
 
   # Créarion d'un DataFrame avec les résultats pondérés
   recherche_scaled = pd.concat([recherche_titre_scaled, recherche_genre_scaled, recherche_acteur_scaled])
